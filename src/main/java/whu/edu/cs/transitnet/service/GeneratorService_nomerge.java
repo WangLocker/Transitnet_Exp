@@ -146,7 +146,7 @@ public class GeneratorService_nomerge {
         String day = items[0];
 
         int[] no_merge_cubes=new int[(int) (Math.pow(8,resolution+1) - 1) / 7];
-        for(int i=0;i<no_merge_cubes.length;i++){
+        for(int i=0;i<Math.pow(8,resolution);i++){
             no_merge_cubes[i]=1;
         }
         bitMap.put(day, no_merge_cubes);
@@ -164,6 +164,13 @@ public class GeneratorService_nomerge {
      * @param level
      * @return
      */
+    //level=6 最粗粒度 数组最末尾
+    //level=5
+    //level=4
+    //level=3
+    //level=2
+    //level=1
+    //level=0 最细粒度 数组最前端
     public int getOffset(int zorder, int level){
         int base = 0;
         for(int i = 0; i < level; i++){
@@ -173,16 +180,21 @@ public class GeneratorService_nomerge {
     }
 
     public int[] offsetToZandL(int offset) {
-        int reverse = (int) (Math.pow(8,resolution+1) - 1) / 7 - offset;
-        int base = 1;
-        int level = resolution;
-        while( reverse / base > 0) {
-            reverse -= base;
-            base *= 8;
-            level--;
+        int level = -1;
+        int base = 0;
+        int nextBase = 0;
+
+        // 计算 level
+        while (offset >= nextBase) {
+            base = nextBase;
+            nextBase += (int) Math.pow(8, resolution - level - 1);
+            level++;
         }
-        int z = (int) Math.pow(8,resolution-level) - reverse;
-        return new int[]{z,level};
+
+        int zOrder = offset - base;
+
+        int[] result = {zOrder, level};
+        return result;
     }
 
 

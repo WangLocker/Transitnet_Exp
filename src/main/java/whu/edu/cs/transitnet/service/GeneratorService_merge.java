@@ -155,7 +155,7 @@ public class GeneratorService_merge {
             if(!bitMap.containsKey(day)){
                 bitMap.put(day, new int[(int) (Math.pow(8,resolution+1) - 1) / 7]);
             }
-            bitMap.get(day)[getOffset(zorder,level)] = 1;
+            bitMap.get(day)[getOffset(zorder,level)] = 0;
             writeMap(cid); return;} //如果应该合并，则写入merge map, bitmap置1
         for(int z  = zorder * 8; z < zorder * 8 + 8; z++){ //否则考察下一层cube
             BFS(day+sep+z+sep+(level-1));

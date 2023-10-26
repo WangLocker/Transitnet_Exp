@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import whu.edu.cs.transitnet.service.index.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -60,7 +64,7 @@ public class HistoricalRangeService_merge {
         int[] ij_e = Decoder.decodeZ2(Encoder.encodeGrid(spatial_range[2],spatial_range[3]));
 
         //encode time range
-        int t_s = 3600 * 9, t_e = 3600 * 13;
+        int t_s = 3600 * 0, t_e = 3600 * 24;
         double delta_t = 86400 / Math.pow(2, resolution);
         int k_s = (int)(t_s/delta_t), k_e = (int) (t_e/delta_t);
 
@@ -85,12 +89,51 @@ public class HistoricalRangeService_merge {
 
         HashSet<TripId> res = new HashSet<>();
         planes_i.forEach(cid -> {
-            String []items=cid.split("@");
-            CubeId cid_zorder=new CubeId(items[1]);
-            if(generatorService.merge_CT_List.containsKey(cid_zorder)){
-                res.addAll(generatorService.merge_CT_List.get(cid_zorder));
+            if(generatorService.merge_CT_List.containsKey(new CubeId(cid))){
+                res.addAll(generatorService.merge_CT_List.get(new CubeId(cid)));
             }
         });
+
+        //test------------------------!
+        Set<TripId> std_res=new HashSet<>();
+        try {
+            FileReader fileReader = new FileReader("D:\\datasets\\all_cubes.txt");
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                HashSet<TripId> temp=generatorService.merge_CT_List.get(new CubeId(line));
+                if(temp!=null){
+                    std_res.addAll(temp);
+                }
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileWriter fileWriter = new FileWriter("D:\\datasets\\hytra_res_m.csv");
+            for (TripId item : res) {
+                fileWriter.write(item.toString() + "\n");
+            }
+            fileWriter.close();
+            System.out.println("HashSet items saved " );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileWriter fileWriter = new FileWriter("D:\\datasets\\hytra_std_res_m.csv");
+            for (TripId item : std_res) {
+                fileWriter.write(item.toString() + "\n");
+            }
+            fileWriter.close();
+            System.out.println("HashSet items saved " );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return res;
     }
 }

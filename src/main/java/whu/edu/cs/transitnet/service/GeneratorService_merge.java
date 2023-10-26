@@ -103,6 +103,8 @@ public class GeneratorService_merge {
 
         //生成compaction map
         for(String day : cubeVol.keySet()) {
+            int[] no_merge_cubes=new int[(int) (Math.pow(8,resolution+1) - 1) / 7];
+            bitMap.put(day, no_merge_cubes);
             BFS(day+sep+0+sep+resolution);
         }
     }
@@ -155,8 +157,9 @@ public class GeneratorService_merge {
             if(!bitMap.containsKey(day)){
                 bitMap.put(day, new int[(int) (Math.pow(8,resolution+1) - 1) / 7]);
             }
-            bitMap.get(day)[getOffset(zorder,level)] = 0;
-            writeMap(cid); return;} //如果应该合并，则写入merge map, bitmap置1
+            bitMap.get(day)[getOffset(zorder,level)] = 1;//从大cube逐层往下搜索，遇到需要合并的大cube则表示该大cube合并后存在，置1
+            writeMap(cid);
+            return;} //如果应该合并，则写入merge map, bitmap置1
         for(int z  = zorder * 8; z < zorder * 8 + 8; z++){ //否则考察下一层cube
             BFS(day+sep+z+sep+(level-1));
         }
@@ -194,7 +197,7 @@ public class GeneratorService_merge {
         compactionMap.forEach((fromCid, toCid)->{
             //如果是没有执行合并的level 0 cube，直接写入
             if(fromCid.equals(toCid)){
-                merge_CT_List.put(new CubeId(fromCid.split(sep)[1]),CT_List.get(new CubeId(fromCid.split(sep)[1])));
+                merge_CT_List.put(new CubeId(fromCid),CT_List.get(new CubeId(fromCid.split(sep)[1])));
             }
             else {
                 String ancestor = toCid;
@@ -202,9 +205,11 @@ public class GeneratorService_merge {
                     ancestor = compactionMap.get(ancestor);
                 }
 
-                HashSet<TripId> tidSet = merge_CT_List.getOrDefault(new CubeId(ancestor.split(sep)[1]), new HashSet<>());
-                tidSet.addAll(CT_List.getOrDefault(new CubeId(fromCid.split(sep)[1]), new HashSet<>()));
-                merge_CT_List.put(new CubeId(ancestor.split(sep)[1]), tidSet);
+                HashSet<TripId> tidSet = merge_CT_List.getOrDefault(new CubeId(ancestor), new HashSet<>());
+                if(Integer.parseInt(fromCid.split("@")[2])==0){
+                    tidSet.addAll(CT_List.getOrDefault(new CubeId(fromCid.split(sep)[1]), new HashSet<>()));
+                }
+                merge_CT_List.put(new CubeId(ancestor), tidSet);
             }
         });
 

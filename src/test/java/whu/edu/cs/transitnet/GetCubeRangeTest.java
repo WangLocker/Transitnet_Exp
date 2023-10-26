@@ -31,18 +31,15 @@ public class GetCubeRangeTest {
     @Test
     public void ExpTest() throws InterruptedException, IOException, ParseException {
         generatePoints();
-        cubeIds.add(encodeService.encodeCube(40.810,-73.915,(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-05-20 00:00:00")).getTime()));
-        cubeIds.add(encodeService.encodeCube(40.815,-73.910,(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-05-20 23:59:58")).getTime()));
+        for (int i=0;i<points.size();i++) {
 
-//        for (int i=0;i<points.size();i++) {
-//
-//            String recordedTime = points.get(i).getTime();
-//            Date parse = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(recordedTime);
-//            Long time = parse.getTime();
-//
-//            CubeId cubeId = encodeService.encodeCube(points.get(i).getLat(), points.get(i).getLng(), time);
-//            cubeIds.add(cubeId);
-//        }
+            String recordedTime = points.get(i).getTime();
+            Date parse = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(recordedTime);
+            Long time = parse.getTime();
+
+            CubeId cubeId = encodeService.encodeCube(points.get(i).getLat(), points.get(i).getLng(), time);
+            cubeIds.add(cubeId);
+        }
         try {
             FileWriter fileWriter = new FileWriter("D:\\datasets\\all_cubes.txt");
             for (CubeId item : cubeIds) {

@@ -9,12 +9,11 @@ import whu.edu.cs.transitnet.service.index.HistoricalTripIndex;
 import whu.edu.cs.transitnet.service.index.HytraEngineManager;
 import whu.edu.cs.transitnet.service.index.TripId;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.text.ParseException;
 import java.util.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @Service
@@ -46,6 +45,7 @@ public class GeneratorService_merge {
      * zplanes: 2*2^resolution ~ 3*2^resolution- 1
      */
     public HashMap<Integer, HashSet<String>> planes = new HashMap<>();
+    public HashMap<CubeId, HashSet<TripId>> CT_List_DZL=new HashMap<>();
 
     static int epsilon=30;
     static int resolution=6;
@@ -103,8 +103,6 @@ public class GeneratorService_merge {
 
         //生成compaction map
         for(String day : cubeVol.keySet()) {
-            int[] no_merge_cubes=new int[(int) (Math.pow(8,resolution+1) - 1) / 7];
-            bitMap.put(day, no_merge_cubes);
             BFS(day+sep+0+sep+resolution);
         }
     }
@@ -152,18 +150,22 @@ public class GeneratorService_merge {
                 bitMap.put(day, new int[(int) (Math.pow(8,resolution+1) - 1) / 7]);
             }
             bitMap.get(day)[getOffset(zorder,level)] = 1;
-            compactionMap.put(cid, cid); return;} //如果到了level 0，就直接写入本身
+            compactionMap.put(cid, cid);
+            return;
+        } //如果到了level 0，就直接写入本身
+
         if(shouldMerge(cid)) {
             if(!bitMap.containsKey(day)){
                 bitMap.put(day, new int[(int) (Math.pow(8,resolution+1) - 1) / 7]);
             }
             bitMap.get(day)[getOffset(zorder,level)] = 1;//从大cube逐层往下搜索，遇到需要合并的大cube则表示该大cube合并后存在，置1
             writeMap(cid);
-            return;} //如果应该合并，则写入merge map, bitmap置1
+            return;
+        } //如果应该合并，则写入merge map, bitmap置1
+
         for(int z  = zorder * 8; z < zorder * 8 + 8; z++){ //否则考察下一层cube
             BFS(day+sep+z+sep+(level-1));
         }
-
     }
 
     public boolean shouldMerge(String cid) {
@@ -183,21 +185,24 @@ public class GeneratorService_merge {
 
         if(l == 0){return;}
         for(int z  = zorder * 8; z < zorder * 8 + 8; z++){
-            if (cubeVol.get(day)[getOffset(z,l-1)] != 0){
                 String ccid = day+sep+z+sep+(l-1);
                 compactionMap.put(ccid,cid);
                 writeMap(ccid);
-            }
         }
 
     }
 
 
     public void updateMergeCTandTC(){
+
+        CT_List.forEach((C,T)->{
+            CT_List_DZL.put(new CubeId("2023-05-20"+"@"+C+"@"+"0"),CT_List.get(C));
+        });
+        CT_List=CT_List_DZL;
         compactionMap.forEach((fromCid, toCid)->{
             //如果是没有执行合并的level 0 cube，直接写入
             if(fromCid.equals(toCid)){
-                merge_CT_List.put(new CubeId(fromCid),CT_List.get(new CubeId(fromCid.split(sep)[1])));
+                    merge_CT_List.put(new CubeId(fromCid),CT_List.get(new CubeId(fromCid)));
             }
             else {
                 String ancestor = toCid;
@@ -206,12 +211,40 @@ public class GeneratorService_merge {
                 }
 
                 HashSet<TripId> tidSet = merge_CT_List.getOrDefault(new CubeId(ancestor), new HashSet<>());
-                if(Integer.parseInt(fromCid.split("@")[2])==0){
-                    tidSet.addAll(CT_List.getOrDefault(new CubeId(fromCid.split(sep)[1]), new HashSet<>()));
-                }
+                tidSet.addAll(CT_List.getOrDefault(new CubeId(fromCid), new HashSet<>()));
                 merge_CT_List.put(new CubeId(ancestor), tidSet);
             }
         });
+
+        //test
+        try {
+            FileReader fileReader = new FileReader("D:\\datasets\\std_res.csv");
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            FileWriter fileWriter = new FileWriter("D:\\datasets\\cube_include_stdres.csv");
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                TripId tid=new TripId(line);
+                AtomicBoolean flag= new AtomicBoolean(false);
+                merge_CT_List.forEach((C,T)->{
+                    if(T!=null&&T.contains(tid)){
+                        try {
+                            fileWriter.write(C.toString()+"{"+tid+"\n");
+                            flag.set(true);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+                if(flag.equals(new AtomicBoolean(false))){
+                    fileWriter.write(tid+"not include in mergeList"+"\n");
+                }
+            }
+            bufferedReader.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //test
 
         merge_CT_List.forEach((cid, tidSet) ->{
             if(tidSet != null){
@@ -254,15 +287,16 @@ public class GeneratorService_merge {
     }
 
     public int[] offsetToZandL(int offset) {
-        int reverse = (int) (Math.pow(8,resolution+1) - 1) / 7 - offset;
+        int reverse = (int) (Math.pow(8.0,(double) resolution+1) - 1.0) / 7 - (offset+1);
         int base = 1;
-        int level = resolution;
-        while( reverse / base > 0) {
-            reverse -= base;
-            base *= 8;
-            level--;
+
+
+        int level ;
+        for(level=resolution;reverse/base>0;--level){
+            reverse-=base;
+            base*=8;
         }
-        int z = (int) Math.pow(8,resolution-level) - reverse;
+        int z = (int) Math.pow(8.0,(double) resolution-level) - (reverse+1);
         return new int[]{z,level};
     }
 
@@ -423,5 +457,17 @@ public class GeneratorService_merge {
         }catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean testMap() {
+        for(int i=0;i<bitMap.get("2023-05-20").length;i++){
+            if(bitMap.get("2023-05-20")[i]==1){
+                int[] zl=offsetToZandL(i);
+                if(!merge_CT_List.containsKey(new CubeId("2023-05-20@"+zl[0]+"@"+zl[1]))){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

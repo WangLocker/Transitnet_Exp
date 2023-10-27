@@ -53,6 +53,7 @@ public class HistoricalRangeService_merge {
         generatorService.generateMap();
         //更新索引
         generatorService.updateMergeCTandTC();
+        boolean flag=generatorService.testMap();
         //生成sweeplines
         planes = generatorService.generatePlanes();
         return spatial_hytra(planes);
@@ -90,7 +91,9 @@ public class HistoricalRangeService_merge {
         HashSet<TripId> res = new HashSet<>();
         planes_i.forEach(cid -> {
             if(generatorService.merge_CT_List.containsKey(new CubeId(cid))){
-                res.addAll(generatorService.merge_CT_List.get(new CubeId(cid)));
+                if(generatorService.merge_CT_List.get(new CubeId(cid))!=null){
+                    res.addAll(generatorService.merge_CT_List.get(new CubeId(cid)));
+                }
             }
         });
 
@@ -102,7 +105,7 @@ public class HistoricalRangeService_merge {
 
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                HashSet<TripId> temp=generatorService.merge_CT_List.get(new CubeId(line));
+                HashSet<TripId> temp=generatorService.merge_CT_List.get(new CubeId("2023-05-20"+"@"+line+"@"+"0"));
                 if(temp!=null){
                     std_res.addAll(temp);
                 }

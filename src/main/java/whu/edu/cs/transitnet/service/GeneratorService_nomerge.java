@@ -118,7 +118,7 @@ public class GeneratorService_nomerge {
                     //将cube转换Planes
                     int[] zl = offsetToZandL(i);
                     String cid = day+sep+zl[0]+sep+zl[1];
-                    int[] box = Decoder.decodeZ3(zl[0],zl[1]);
+                    int[] box = decodeZ3(zl[0],zl[1]);
                     for (int a = box[0]; a <= box[1]; a++){
                         if(!planes.containsKey(a)){planes.put(a, new HashSet<>());}
                         planes.get(a).add(cid);
@@ -209,5 +209,54 @@ public class GeneratorService_nomerge {
             offsets[i-1] = getOffset(offset / (int) Math.pow(8,i), i);
         }
         return offsets;
+    }
+
+    public int[] decodeZ3(int zorder, int level) {
+        int digits = 3 * 6;
+
+        String bits;
+        for(bits = Integer.toBinaryString(zorder); digits > bits.length(); bits = "0" + bits) {
+        }
+
+        String bitsI = "";
+        String bitsJ = "";
+        String bitsK = "";
+
+        int i;
+        for(i = 0; i < bits.length(); ++i) {
+            if (i % 3 == 0) {
+                bitsI = bitsI + bits.charAt(i);
+            }
+
+            if (i % 3 == 1) {
+                bitsJ = bitsJ + bits.charAt(i);
+            }
+
+            if (i % 3 == 2) {
+                bitsK = bitsK + bits.charAt(i);
+            }
+        }
+
+        i = bitToint(bitsI);
+        int J = bitToint(bitsJ);
+        int K = bitToint(bitsK);
+        int i1 = i * (int)Math.pow(2, (double)level);
+        int i2 = i1 + (int)Math.pow(2, (double)level) - 1;
+        int j1 = J * (int)Math.pow(2, (double)level);
+        int j2 = j1 + (int)Math.pow(2, (double)level) - 1;
+        int k1 = K * (int)Math.pow(2, (double)level);
+        int k2 = k1 + (int)Math.pow(2, (double)level) - 1;
+        return new int[]{i1, i2, j1, j2, k1, k2};
+    }
+
+    public int bitToint(String bits) {
+        int sum = 0;
+        int length = bits.length();
+
+        for(int i = 0; i < length; ++i) {
+            sum = (int)((double)sum + (double)Integer.parseInt(String.valueOf(bits.charAt(i))) * Math.pow(2.0, (double)(length - i - 1)));
+        }
+
+        return sum;
     }
 }

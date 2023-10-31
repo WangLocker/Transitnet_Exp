@@ -20,10 +20,12 @@ public class HistoricalRangeExpTest_nomerge {
 
     @Test
     public void ExpTest() throws InterruptedException, IOException, ParseException {
-        double []ps={40.810,-73.915,
-                    40.815,-73.910};
+        double []ps={40.8100, -73.9200, 40.8367, -73.8840};
         String date="2023-05-20";
         historicalrangeExpService.setup(ps,date);
-        historicalrangeExpService.historaical_range_search();
+        double average=0;
+        average=historicalrangeExpService.historaical_range_search();
+        System.out.println("【average time】============");
+        System.out.println(average+" ms");
     }
 }

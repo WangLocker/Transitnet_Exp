@@ -48,16 +48,22 @@ public class HistoricalRangeService_nomerge {
         date=d;
     }
 
-    public HashSet<TripId> historaical_range_search() throws ParseException {
+    public double historaical_range_search() throws ParseException {
         generatorService.setup(date);
         //师姐说先不考虑merge，那么去掉合并与更新索引这两步,下面两行的函数注释掉了主要内容，只做了最简单的工作
         generatorService.generateMap();
         generatorService.updateMergeCTandTC();
         planes = generatorService.generatePlanes();
-        return spatial_hytra(planes);
+        double total=0;
+        for(int i=0;i<10000;i++){
+            System.out.println("第"+(i+1)+"次 range查询");
+            total+=spatial_hytra(planes);
+        }
+        return total/10000.0;
     }
 
-    public HashSet<TripId> spatial_hytra(HashMap<Integer, HashSet<String>> planes){
+    public double spatial_hytra(HashMap<Integer, HashSet<String>> planes){
+        Long startTime = System.currentTimeMillis();
         //decode spatial range
         int[] ij_s = Decoder.decodeZ2(Encoder.encodeGrid(spatial_range[0],spatial_range[1]));
         int[] ij_e = Decoder.decodeZ2(Encoder.encodeGrid(spatial_range[2],spatial_range[3]));
@@ -94,35 +100,38 @@ public class HistoricalRangeService_nomerge {
                 res.addAll(generatorService.merge_CT_List.get(cid_zorder));
             }
         });
+        double endTime = System.currentTimeMillis();
+        double running=endTime-startTime;
+        System.out.println("[NO_MERGE_HYTRA_TIME] "+running+" ms");
 
         //test------------------------!
-        Set<TripId> std_res=new HashSet<>();
-        try {
-            FileReader fileReader = new FileReader("D:\\datasets\\all_cubes.txt");
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                HashSet<TripId> temp=generatorService.merge_CT_List.get(new CubeId(line));
-                if(temp!=null){
-                    std_res.addAll(temp);
-                }
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            FileWriter fileWriter = new FileWriter("D:\\datasets\\hytra_res.csv");
-            for (TripId item : res) {
-                fileWriter.write(item.toString() + "\n");
-            }
-            fileWriter.close();
-            System.out.println("HashSet items saved " );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        Set<TripId> std_res=new HashSet<>();
+//        try {
+//            FileReader fileReader = new FileReader("D:\\datasets\\all_cubes.txt");
+//            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//
+//            String line;
+//            while ((line = bufferedReader.readLine()) != null) {
+//                HashSet<TripId> temp=generatorService.merge_CT_List.get(new CubeId(line));
+//                if(temp!=null){
+//                    std_res.addAll(temp);
+//                }
+//            }
+//            bufferedReader.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            FileWriter fileWriter = new FileWriter("D:\\datasets\\hytra_res.csv");
+//            for (TripId item : res) {
+//                fileWriter.write(item.toString() + "\n");
+//            }
+//            fileWriter.close();
+//            System.out.println("HashSet items saved " );
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         //test-------------------------!
-        return res;
+        return running;
     }
 }

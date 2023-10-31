@@ -251,7 +251,8 @@ public class HistoricalKNNExpServiceTEST {
      * @throws ParseException
      */
     public void getTopKTrips(int k) throws IOException, InterruptedException, ParseException {
-        allTripCubeList = historicalTripIndex.getTripCubeList();
+        HashMap<TripId, ArrayList<CubeId>> tempTClist=new HashMap<>();
+        tempTClist = historicalTripIndex.getTripCubeList();
 
         // 获取 tripPointList，遍历每个 trip 做实验
         HashMap<TripId, ArrayList<RealTimePointEntity>> partialTripPointList = historicalTripIndex.getTripPointList();
@@ -269,6 +270,11 @@ public class HistoricalKNNExpServiceTEST {
             num++;
 
             tripPointList.put(tripId, partialTripPointList.get(tripId));
+        }
+
+        //实际上由下面这个for循环控制datasize
+        for(TripId tid:tripPointList.keySet()){
+            allTripCubeList.put(tid,tempTClist.get(tid));
         }
 
 

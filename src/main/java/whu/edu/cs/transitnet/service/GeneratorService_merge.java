@@ -66,14 +66,21 @@ public class GeneratorService_merge {
 
         String time_s=date+" 00:00:00";
         String time_e=date+" 23:59:59";
-        historicalTripIndex.tripCubeListSerializationAndDeserilization(time_s,time_e);
-        TC_List_arr=historicalTripIndex.getTripCubeList();
+//        historicalTripIndex.tripCubeListSerializationAndDeserilization(time_s,time_e);
+//        TC_List_arr=historicalTripIndex.getTripCubeList();
 
         // 遍历 CT_List_arr 并将其转换为 HashSet 并存储到 CT_List 中
+        double rate=0.6;
+        int num= (int) (rate*CT_List_arr.size());
+        int it=0;
         for (CubeId cubeId : CT_List_arr.keySet()) {
+            if(it==num){
+                break;
+            }
             ArrayList<TripId> tidList = CT_List_arr.get(cubeId);
             HashSet<TripId> tSet = new HashSet<>(tidList);
             CT_List.put(cubeId, tSet);
+            it++;
         }
     }
 
@@ -218,33 +225,33 @@ public class GeneratorService_merge {
         });
 
         //test
-        try {
-            FileReader fileReader = new FileReader("D:\\datasets\\std_res.csv");
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            FileWriter fileWriter = new FileWriter("D:\\datasets\\cube_include_stdres.csv");
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                TripId tid=new TripId(line);
-                AtomicBoolean flag= new AtomicBoolean(false);
-                merge_CT_List.forEach((C,T)->{
-                    if(T!=null&&T.contains(tid)){
-                        try {
-                            fileWriter.write(tid+"\n");
-                            flag.set(true);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
-                if(flag.equals(new AtomicBoolean(false))){
-                    fileWriter.write(tid+"not include in mergeList"+"\n");
-                }
-            }
-            bufferedReader.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            FileReader fileReader = new FileReader("D:\\datasets\\std_res.csv");
+//            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//            FileWriter fileWriter = new FileWriter("D:\\datasets\\cube_include_stdres.csv");
+//            String line;
+//            while ((line = bufferedReader.readLine()) != null) {
+//                TripId tid=new TripId(line);
+//                AtomicBoolean flag= new AtomicBoolean(false);
+//                merge_CT_List.forEach((C,T)->{
+//                    if(T!=null&&T.contains(tid)){
+//                        try {
+//                            fileWriter.write(tid+"\n");
+//                            flag.set(true);
+//                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                });
+//                if(flag.equals(new AtomicBoolean(false))){
+//                    fileWriter.write(tid+"not include in mergeList"+"\n");
+//                }
+//            }
+//            bufferedReader.close();
+//            fileWriter.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         //test
 
         merge_CT_List.forEach((cid, tidSet) ->{

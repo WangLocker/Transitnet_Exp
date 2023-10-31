@@ -66,14 +66,21 @@ public class GeneratorService_nomerge {
 
         String time_s=date+" 00:00:00";
         String time_e=date+" 23:59:59";
-        historicalTripIndex.tripCubeListSerializationAndDeserilization(time_s,time_e);
-        TC_List_arr=historicalTripIndex.getTripCubeList();
+//        historicalTripIndex.tripCubeListSerializationAndDeserilization(time_s,time_e);
+//        TC_List_arr=historicalTripIndex.getTripCubeList();
 
         // 遍历 CT_List_arr 并将其转换为 HashSet 并存储到 CT_List 中
+        double rate=0.6;
+        int num= (int) (rate*CT_List_arr.size());
+        int it=0;
         for (CubeId cubeId : CT_List_arr.keySet()) {
+            if(it==num){
+                break;
+            }
             ArrayList<TripId> tidList = CT_List_arr.get(cubeId);
             HashSet<TripId> tSet = new HashSet<>(tidList);
             CT_List.put(cubeId, tSet);
+            it++;
         }
     }
 

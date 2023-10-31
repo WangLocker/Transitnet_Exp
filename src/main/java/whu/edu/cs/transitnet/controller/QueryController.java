@@ -141,9 +141,10 @@ public class QueryController {
                 params.getPoints().get(1).getLng()};
         String day=params.getTimerange();
         HistoricalRangeService.setup(temp, day);
-        HashSet<TripId> res = HistoricalRangeService.historaical_range_search();
-        RangeHisQueryResultVo res_re=new RangeHisQueryResultVo(res);
-        return res_re;
+        //HashSet<TripId> res = HistoricalRangeService.historaical_range_search();
+        //RangeHisQueryResultVo res_re=new RangeHisQueryResultVo(res);
+        //return res_re;
+        return null;
     }
 
 

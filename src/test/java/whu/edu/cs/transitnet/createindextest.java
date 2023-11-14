@@ -20,6 +20,6 @@ public class createindextest {
 
     @Test
     public void createindextest() throws InterruptedException, IOException, ParseException {
-        his_index.init();
+        System.out.println("11111111111111111111111111111");
     }
 }

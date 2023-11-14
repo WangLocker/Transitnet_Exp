@@ -109,7 +109,7 @@ public class EncodeService {
         double[] spatialDomain = hytraEngineManager.getParams().getSpatialDomain();
         double deltaX = (spatialDomain[2] - spatialDomain[0]) / Math.pow(2.0D, (double) resolution);
         double deltaY = (spatialDomain[3] - spatialDomain[1]) / Math.pow(2.0D, (double) resolution);
-        double deltaT = 86400.0D / Math.pow(2.0D, (double)resolution);
+        double deltaT = (86400.0D / Math.pow(2.0D, (double)resolution));
 
         Date d = new Date();
         d.setTime(time);
@@ -121,8 +121,10 @@ public class EncodeService {
         String[] date_time = date_hour_min_sec.split(" ");
         // 取的是时分秒
         String[] hour_min_sec = date_time[1].split(":");
+        String day=date_time[0].split("-")[2];
         // 转化成秒
-        double t = (double)(Integer.parseInt(hour_min_sec[0]) * 3600 + Integer.parseInt(hour_min_sec[1]) * 60 + Integer.parseInt(hour_min_sec[2]));
+        double t = (double)(Integer.parseInt(hour_min_sec[0]) * 3600 + Integer.parseInt(hour_min_sec[1]) * 60 + Integer.parseInt(hour_min_sec[2]))
+                +86400*(Integer.parseInt(day)-1);
         int i = (int)((lat - spatialDomain[0]) / deltaX);
         int j = (int)((lon - spatialDomain[1]) / deltaY);
         int k = (int)(t / deltaT);

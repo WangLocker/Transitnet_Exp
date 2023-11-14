@@ -11,11 +11,11 @@ import java.text.ParseException;
 public class generate_Qr_Test {
     @Test
     public void ExpTest() throws InterruptedException, IOException, ParseException {
-        double[] S = {40.810,-73.920};
+        double[] S = {30.5,114.2};
         double minlat = S[0];
         double minlon = S[1];
         double lat1 = GeoUtil.increaseLat(minlat,5000 );
         double lon1 = GeoUtil.increaseLng(minlat,minlon,5000);
-        System.out.println("40.8100"+", "+"-73.9200"+", "+lat1+", "+lon1);
+        System.out.println("30.5000"+", "+"114.2000"+", "+lat1+", "+lon1);
     }
 }

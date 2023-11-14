@@ -20,7 +20,7 @@ public class HistoricalRangeExpTest_merge {
 
     @Test
     public void ExpTest() throws InterruptedException, IOException, ParseException {
-        double []ps={40.8100, -73.9200, 40.8367, -73.8840};
+        double []ps={30.5000, 114.2000, 30.5267, 114.2313};
         String date="2023-05-20";
         historicalrangeExpService.setup(ps,date);
         historicalrangeExpService.historaical_range_search();

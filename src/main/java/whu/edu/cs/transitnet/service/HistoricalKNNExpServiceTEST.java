@@ -278,25 +278,25 @@ public class HistoricalKNNExpServiceTEST {
         }
 
 
-        try {
-            FileWriter csvWriter = new FileWriter("D://datasets//selected_trips_" + ratio * 100 +"_"+k+"_"+ ".csv");            // 写入CSV文件标题行
-
-            Random random = new Random();
-            List<TripId> allTripIds = new ArrayList<>(tripPointList.keySet());
-
-            // 写入随机选择的数据
-            for (int i = 0; i < 25; i++) {
-                int randomIndex = random.nextInt(allTripIds.size());
-                TripId randomTripId = allTripIds.remove(randomIndex);
-
-                csvWriter.append(randomTripId.toString());
-                csvWriter.append("\n");
-            }
-
-            csvWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            FileWriter csvWriter = new FileWriter("D://datasets//selected_trips_" + ratio * 100 +"_"+k+"_"+ ".csv");            // 写入CSV文件标题行
+//
+//            Random random = new Random();
+//            List<TripId> allTripIds = new ArrayList<>(tripPointList.keySet());
+//
+//            // 写入随机选择的数据
+//            for (int i = 0; i < 25; i++) {
+//                int randomIndex = random.nextInt(allTripIds.size());
+//                TripId randomTripId = allTripIds.remove(randomIndex);
+//
+//                csvWriter.append(randomTripId.toString());
+//                csvWriter.append("\n");
+//            }
+//
+//            csvWriter.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
         Long partialTime = 0L;
@@ -365,7 +365,7 @@ public class HistoricalKNNExpServiceTEST {
 
             Long startTime = System.currentTimeMillis();
 
-            int choice = 1;
+            int choice = 0;
 
             switch (choice) {
                 case 2:
@@ -403,14 +403,14 @@ public class HistoricalKNNExpServiceTEST {
                 // 请不要删除以下注释代码
 
                 // 利用 LOCS 计算出来的相似度
-//                 double sim = LongestOverlappedCubeSeries(userCubeList, tripCubeList.get(tripId1), Integer.MAX_VALUE);
-//                 tripSimListLOCS.put(tripId1, sim);
+                 double sim = LongestOverlappedCubeSeries(userCubeList, tripCubeList.get(tripId1), Integer.MAX_VALUE);
+                 tripSimListLOCS.put(tripId1, sim);
 
                 // 利用 LOC 计算出来的相似度
-                List<CubeId> intersection0 = new ArrayList<>(userCubeList);
-                intersection0.retainAll(tripCubeList.get(tripId1));
-                List<CubeId> intersection1 = intersection0.stream().distinct().collect(Collectors.toList());
-                tripSimListLOC.put(tripId1, intersection1.size());
+//                List<CubeId> intersection0 = new ArrayList<>(userCubeList);
+//                intersection0.retainAll(tripCubeList.get(tripId1));
+//                List<CubeId> intersection1 = intersection0.stream().distinct().collect(Collectors.toList());
+//                tripSimListLOC.put(tripId1, intersection1.size());
 
                 // 利用 DTW 计算出来的相似度
                 // double sim1 = DynamicTimeWarping(userCubeList, tripCubeList.get(tripId1));
@@ -426,32 +426,32 @@ public class HistoricalKNNExpServiceTEST {
             }
 
             // topk LOCS
-//            List<TripId> topTripsLOCS = tripSimListLOCS.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
-//            Collections.sort(topTripsLOCS, new Comparator<TripId>() {
-//                @Override
-//                public int compare(TripId a, TripId b) { // 从大到小
-//                    Double t = tripSimListLOCS.get(a) - tripSimListLOCS.get(b);
-//                    int flag = -1;
-//                    if (t < 0) flag = 1;
-//                    if (t == 0) flag = 0;
-//                    return flag;
-//                }
-//            });
-//            List<TripId> topkTripsLOCS = new ArrayList<>();
-//            if(topTripsLOCS.size() >= k) {
-//                topkTripsLOCS = topTripsLOCS.subList(0, k);
-//            } else {
-//                topkTripsLOCS = topTripsLOCS;
-//            }
+            List<TripId> topTripsLOCS = tripSimListLOCS.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
+            Collections.sort(topTripsLOCS, new Comparator<TripId>() {
+                @Override
+                public int compare(TripId a, TripId b) { // 从大到小
+                    Double t = tripSimListLOCS.get(a) - tripSimListLOCS.get(b);
+                    int flag = -1;
+                    if (t < 0) flag = 1;
+                    if (t == 0) flag = 0;
+                    return flag;
+                }
+            });
+            List<TripId> topkTripsLOCS = new ArrayList<>();
+            if(topTripsLOCS.size() >= k) {
+                topkTripsLOCS = topTripsLOCS.subList(0, k);
+            } else {
+                topkTripsLOCS = topTripsLOCS;
+            }
 
             // topk LOC
-            List<TripId> topTripsLOC = tripSimListLOC.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).map(Map.Entry::getKey).collect(Collectors.toList());
-            List<TripId> topkTripsLOC = new ArrayList<>();
-            if(topTripsLOC.size() >= k) {
-                topkTripsLOC = topTripsLOC.subList(0, k);
-            } else {
-                topkTripsLOC = topTripsLOC;
-            }
+//            List<TripId> topTripsLOC = tripSimListLOC.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).map(Map.Entry::getKey).collect(Collectors.toList());
+//            List<TripId> topkTripsLOC = new ArrayList<>();
+//            if(topTripsLOC.size() >= k) {
+//                topkTripsLOC = topTripsLOC.subList(0, k);
+//            } else {
+//                topkTripsLOC = topTripsLOC;
+//            }
 
             // topk DTW
 //            List<TripId> topTripsDTW = tripSimListDTW.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());

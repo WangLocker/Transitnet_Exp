@@ -47,6 +47,20 @@ public class HistoricalRangeService_merge {
         date=d;
     }
 
+    public void prepare() throws ParseException {
+        generatorService.setup(date);
+        //执行合并
+        generatorService.generateMap();
+        //更新索引
+        generatorService.updateMergeCTandTC();
+        //生成sweeplines
+        planes = generatorService.generatePlanes();
+    }
+
+    public void exec(){
+        spatial_hytra(planes);
+    }
+
     public HashSet<TripId> historaical_range_search() throws ParseException {
         generatorService.setup(date);
         //执行合并
@@ -60,13 +74,12 @@ public class HistoricalRangeService_merge {
     }
 
     public HashSet<TripId> spatial_hytra(HashMap<Integer, HashSet<String>> planes){
-        Long startTime = System.currentTimeMillis();
         //decode spatial range
         int[] ij_s = Decoder.decodeZ2(Encoder.encodeGrid(spatial_range[0],spatial_range[1]));
         int[] ij_e = Decoder.decodeZ2(Encoder.encodeGrid(spatial_range[2],spatial_range[3]));
 
         //encode time range
-        int t_s = 3600 * 0, t_e = 3600 * 24;
+        int t_s = 3600 * 0, t_e = 3600 * 24*31;
         double delta_t = 86400 / Math.pow(2, resolution);
         int k_s = (int)(t_s/delta_t), k_e = (int) (t_e/delta_t);
 
@@ -97,9 +110,6 @@ public class HistoricalRangeService_merge {
                 }
             }
         });
-        Long endTime = System.currentTimeMillis();
-        Long running=endTime-startTime;
-        System.out.println("[MERGE_HYTRA_TIME] "+running+" ms");
         //test------------------------!
 //        Set<TripId> std_res=new HashSet<>();
 //        try {

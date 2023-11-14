@@ -23,7 +23,8 @@ public class HistoricalRangeExpTest_rtree {
 
     @Test
     public void ExpTest() throws InterruptedException, IOException, ParseException {
-        double []ps={40.8100, -73.9200, 40.8367, -73.8840};
+        double []ps={30.5000, 114.2000, 30.5267, 114.2313
+        };
         historicalrangeExpService.setup(ps);
         List<TripId> res=historicalrangeExpService.rtreeTraj();
     }

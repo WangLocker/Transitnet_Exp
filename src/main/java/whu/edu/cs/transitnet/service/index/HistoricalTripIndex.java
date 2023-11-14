@@ -60,8 +60,8 @@ public class HistoricalTripIndex {
 //            return;
 //        }
 
-        String startTime = "2023-05-20 00:00:00";
-        String endTime = "2023-05-20 23:59:59";
+        String startTime = "2021-01-20 00:00:00";
+        String endTime = "2022-05-20 23:59:59";
         String date = getDateFromTime(startTime);
 
         tripCubeListSerializationAndDeserilization(startTime, endTime);
@@ -79,7 +79,7 @@ public class HistoricalTripIndex {
         // 2. 再根据 dateTime 和 tripId 筛选出每个 tripId 在 dateTime 当天的所有轨迹点 【按时间升序】
         System.out.println("=============================");
         System.out.println("[HISTORICALTRIPINDEX] number of tripIds: " + tripIdsByDate.size());
-        int num = 8890;
+        int num = tripIdsByDate.size();
         for (int i = 0; i < num; i++) {
             System.out.println("[HISTORICALTRIPINDEX] number of scanned tripIds: " + (i + 1));
 
@@ -119,8 +119,8 @@ public class HistoricalTripIndex {
     public void tripPointListSerializationAndDeserialization(String startTime, String endTime) throws ParseException {
         String date = getDateFromTime(startTime);
 
-        File dateTripPointFile = new File("./src/main/" + date + " TPList.txt");
-
+        File dateTripPointFile = new File("./src/main/" + "elec_TPList.txt");
+//        File dateTripPointFile = new File("./src/main/" + "2023-05-20 TPList.txt");
         if(!dateTripPointFile.exists()) {
             System.out.println("=============================");
             System.out.println("[HISTORICALTRIPINDEX] dateTripPointFile Not Exists... Start serializing TCList...");
@@ -212,8 +212,8 @@ public class HistoricalTripIndex {
         String date = getDateFromTime(startTime);
 
         int resolution = hytraEngineManager.getParams().getResolution();
-        File dateTripCubeFile = new File("./src/main/" + date + " TCList_" + resolution + ".txt");
-
+        File dateTripCubeFile = new File("./src/main/" + "elec_TCList_" + resolution + ".txt");
+//        File dateTripCubeFile = new File("./src/main/" + "2023-05-20 TCList_" + resolution + ".txt");
         if(!dateTripCubeFile.exists()) {
             System.out.println("=============================");
             System.out.println("[HISTORICALTRIPINDEX] dateTripCubeFile Not Exists... Start serializing TCList...");
@@ -306,8 +306,8 @@ public class HistoricalTripIndex {
 
 
         int resolution = hytraEngineManager.getParams().getResolution();
-        File dateCubeTripFile = new File("./src/main/" + date + " CTList_" + resolution + ".txt");
-
+        File dateCubeTripFile = new File("./src/main/" +"elec_CTList_" + resolution + ".txt");
+//        File dateCubeTripFile = new File("./src/main/" +"2023-05-20 CTList_" + resolution + ".txt");
 
 
         if(!dateCubeTripFile.exists()) {
@@ -429,8 +429,8 @@ public class HistoricalTripIndex {
 
     public void hashcodeTripListSerializationAndDeserilization(String date) throws ParseException {
 
-        File hashcodeTripFile = new File("./src/main/" + date + " hashcodeTripList.txt");
-
+        File hashcodeTripFile = new File("./src/main/" +"elec_hashcodeTripList.txt");
+//        File hashcodeTripFile = new File("./src/main/" +"2023-05-20 hashcodeTripList.txt");
         if(!hashcodeTripFile.exists()) {
             System.out.println("=============================");
             System.out.println("[HISTORICALTRIPINDEX] File Not Exists... Start serializing CTList...");

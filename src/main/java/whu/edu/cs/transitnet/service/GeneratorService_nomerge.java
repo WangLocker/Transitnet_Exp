@@ -47,7 +47,7 @@ public class GeneratorService_nomerge {
     public HashMap<Integer, HashSet<String>> planes = new HashMap<>();
 
     static int epsilon=30;
-    static int resolution=6;
+    static int resolution=8;
     static String sep="@";
 
     public HashMap<CubeId, ArrayList<TripId>> CT_List_arr=new HashMap<>();
@@ -219,7 +219,7 @@ public class GeneratorService_nomerge {
     }
 
     public int[] decodeZ3(int zorder, int level) {
-        int digits = 3 * 6;
+        int digits = 3 * resolution;
 
         String bits;
         for(bits = Integer.toBinaryString(zorder); digits > bits.length(); bits = "0" + bits) {
